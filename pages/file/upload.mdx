@@ -1,6 +1,8 @@
 ## 文件上传
 
-### 在 development，production 增加一条配置
+### 配置
+
+#### 在 development，production 增加一条配置
 
 ![env](/upload/env.png)
 
@@ -8,11 +10,11 @@
 LOCALFILE_API_HOST=http://10.151.40.16/localfile
 ```
 
-### 修改 next.config 文件进行代理
+#### 修改 next.config 文件进行代理
 
 ![nextconfig](/upload/nextconfig.png)
 
-```js filename="env文件" {4} copy
+```js filename="next.config.js" {4} copy
   {
         basePath: false,
         source: '/localfile/:path*',
@@ -20,7 +22,9 @@ LOCALFILE_API_HOST=http://10.151.40.16/localfile
       },
 ```
 
-### 封装组件
+### 封装，使用
+
+#### 封装组件
 
 ```js filename="upload.tsx 封装的上传组件，效果如下图" {41} copy
 import { message, Upload } from 'antd';
@@ -83,7 +87,7 @@ export default function UploadDemo(props: Upload) {
 
 ![upLoad](/upload/upLoad.png)
 
-### 实际使用
+#### 实际使用
 
 ```js filename="index.tsx 实际使用的tsx文件  获取的fileKey为下图 ，拿到了可以进行操作" {5} copy
 import React from "react";
