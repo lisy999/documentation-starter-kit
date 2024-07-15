@@ -1,0 +1,103 @@
+## 文件上传
+
+### 在 development，production 增加一条配置
+
+![env](/upload/env.png)
+
+```js filename="env文件"  copy
+LOCALFILE_API_HOST=http://10.151.40.16/localfile
+```
+
+### 修改 next.config 文件进行代理
+
+![nextconfig](/upload/nextconfig.png)
+
+```js filename="env文件" {4} copy
+  {
+        basePath: false,
+        source: '/localfile/:path*',
+        destination: `${process.env.LOCALFILE_API_HOST}/:path*`, // Proxy to Backend
+      },
+```
+
+### 封装组件
+
+```js filename="upload.tsx 封装的上传组件，效果如下图" {41} copy
+import { message, Upload } from 'antd';
+import { TableBarImport } from 'common/props/buttonProps/Buttons';
+import React, { useState } from 'react';
+import { RcFile, UploadFile, UploadProps } from 'antd/es/upload';
+interface Upload {
+  setFilesKey: (v: string) => void;
+}
+export default function UploadDemo(props: Upload) {
+  const { setFilesKey } = props;
+  const [uploading, setUploading] = useState(false);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const upLoadProps: UploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList([file]);
+      return false;
+    },
+    fileList,
+  };
+  const handlePic = () => {
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', fileList[0] as RcFile);
+    fetch(`/localfile/common/upload`, {
+      method: 'POST',
+      body: formData,
+    })
+      .then((res) => {
+        if (res) {
+          setFileList([]);
+          message.success('上传成功');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setFilesKey(data.url); //传递文件key
+      })
+      .catch(() => {
+        message.error('上传失败');
+      })
+      .finally(() => {
+        setUploading(false);
+      });
+  };
+  return (
+    <>
+      <Upload {...upLoadProps}>{fileList.length === 0 && <TableBarImport text="上传文件" />}</Upload>
+      {fileList.length !== 0 && <TableBarImport text={uploading ? '上传中' : '确定上传'} onClick={handlePic} />}
+    </>
+  );
+}
+```
+
+![upLoad](/upload/upLoad.png)
+
+### 实际使用
+
+```js filename="index.tsx 实际使用的tsx文件  获取的fileKey为下图 ，拿到了可以进行操作" {5} copy
+import React from "react";
+import UploadDemo from "./upload";
+export default function Page() {
+  const setFilesKey = (fileKey: string) => {
+    console.log(fileKey, "fileKey"); //文件key
+  };
+  return (
+    <>
+      <UploadDemo setFilesKey={setFilesKey} />
+    </>
+  );
+}
+```
+
+![fileKey](/upload/fileKey.png)

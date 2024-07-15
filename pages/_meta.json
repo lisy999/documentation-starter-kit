@@ -1,9 +1,7 @@
 {
   "index": "介绍",
-  "jishuzhan": "技术栈",
+  "file": "文件",
   "another": "Another Page",
-  "advanced": "Advanced (A Folder)",
-  "index2": "222",
   "about": {
     "title": "About",
     "type": "page"
