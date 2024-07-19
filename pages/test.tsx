@@ -1,4 +1,4 @@
-import { decryptData, TransformData } from "./test1";
+import { decryptData, TransformData } from "../components/test1";
 import React from "react";
 export default function Test1() {
   const onclick = async () => {
