@@ -1,4 +1,3 @@
-import { Button } from "antd";
 import { decryptData, TransformData } from "./test1";
 import React from "react";
 export default function Test1() {
@@ -14,7 +13,7 @@ export default function Test1() {
   };
   return (
     <div>
-      <Button onClick={onclick}>按钮</Button>
+      <button onClick={onclick}>按钮</button>
     </div>
   );
 }
