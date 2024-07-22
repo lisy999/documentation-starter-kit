@@ -1,0 +1,83 @@
+# 加密解密
+
+```js filename="使用 forge" {4} copy
+"node-forge": "^1.3.1",
+```
+
+## 点击按钮查看控制台打印
+
+```js filename="原始数据"  copy
+SELECT LEFT(WORK_DATE,6) AS 统计日 EFT(W 'B104' GROUP BY LEFT(WORK_DATE,6) ORDER BY LEFT(WORK_DATE,6) DESC
+
+```
+
+import Encryption from "../components/encryption";
+
+<Encryption />
+## 函数
+
+```ts filename="components/encryption/tool.ts" copy
+import forge from "node-forge";
+const keyStr = "1111222233334444"; // 128 位密钥的十六进制表示
+export function encrypt(word) {
+  var iv = forge.random.getBytesSync(12); // 生成随机iv 12字节
+  var cipher = forge.cipher.createCipher("AES-GCM", keyStr); // 生成AES-GCM模式的cipher对象 并传入密钥
+  cipher.start({
+    iv,
+  });
+  cipher.update(forge.util.createBuffer(forge.util.encodeUtf8(word)));
+  cipher.finish();
+  var encrypted = cipher.output;
+  var tag = cipher.mode.tag;
+  return window.btoa(iv + encrypted.data + tag.data);
+}
+export function decrypt(datamsg) {
+  datamsg = window.atob(datamsg);
+  const iv = datamsg.slice(0, 12);
+  const tag = datamsg.slice(-16);
+  const data = datamsg.slice(12, datamsg.length - 16);
+  var decipher = forge.cipher.createDecipher("AES-GCM", keyStr);
+  decipher.start({
+    iv,
+    tag,
+  });
+  decipher.update(forge.util.createBuffer(data));
+  const pass = decipher.finish();
+  if (pass) {
+    return decipher.output.toString();
+  }
+}
+```
+
+## 实际使用
+
+```ts filename="components/encryption/index.tsx" copy
+import React from "react";
+import { encrypt, decrypt } from "./tool"; // 替换为实际路径
+import { Button } from "antd";
+export default function Encryption() {
+  const handleClick = async () => {
+    try {
+      // 原始数据
+      const originalText =
+        "SELECT LEFT(WORK_DATE,6) AS 统计日EFT(W 'B104' GROUP BY LEFT(WORK_DATE,6) ORDER BY LEFT(WORK_DATE,6) DESC";
+      // 加密数据
+      const encryptedData = encrypt(originalText);
+      console.log("Encrypted Data:", encryptedData);
+      // 解密数据
+      const decryptedData = decrypt(
+        "4We+VFVJQihASeUlLKcaYA45z19WEX/404jnF6Nd34Bfxz5FcTo14DIO"
+      );
+      console.log("Decrypted Data:", decryptedData);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  return (
+    <div style={{ marginTop: 10 }}>
+      <Button onClick={handleClick}>加密解密</Button>
+    </div>
+  );
+}
+```
