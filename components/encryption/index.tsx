@@ -1,5 +1,5 @@
 import React from "react";
-import { encrypt, decrypt } from "./tool"; // 替换为实际路径
+import { encrypt, decrypt } from "./forge"; // 替换为实际路径
 import { Button } from "antd";
 export default function Encryption() {
   const handleClick = async () => {
